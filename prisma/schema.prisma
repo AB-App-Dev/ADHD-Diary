@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                  String              @id @default(cuid())
+  email               String              @unique
+  emailVerified       Boolean             @default(false)
+  name                String?
+  image               String?
+  monitoringSessions  MonitoringSession[]
+  sessions            session[]
+  accounts            account[]
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+}
+
+model session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@index([userId])
+}
+
+model verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+}
+
+model MonitoringSession {
+  id              String    @id @default(cuid())
+  user            User      @relation(fields: [userId], references: [id])
+  userId          String
+  medicationName  String
+  dosage          String
+  intakeTimes     String[]
+  monitoringFrom  DateTime
+  monitoringTo    DateTime
+  isLocked        Boolean   @default(false)
+  entries         Entry[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Entry {
+  id          String            @id @default(cuid())
+  session     MonitoringSession @relation(fields: [sessionId], references: [id])
+  sessionId   String
+  date        DateTime  // Date of the entry (workday or weekend)
+  type        EntryType // WORKDAY or WEEKEND
+  answers     Json      // JSON object storing form answers and comments
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([sessionId, date]) // One entry per date per session
+}
+
+enum EntryType {
+  WORKDAY
+  WEEKEND
+}
