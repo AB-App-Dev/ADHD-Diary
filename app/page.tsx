@@ -19,7 +19,7 @@ export default async function Home() {
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             ADHS-Tagebuch
           </h1>
-          <p className="mt-2 text-sm text-muted">
+          <p className="mt-2 text-sm text-muted-foreground">
             Medikamentenwirkung und tägliches Wohlbefinden erfassen
           </p>
         </div>

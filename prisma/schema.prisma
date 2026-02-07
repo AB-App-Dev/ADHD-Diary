@@ -71,6 +71,7 @@ model MonitoringSession {
   monitoringFrom  DateTime
   monitoringTo    DateTime
   isLocked        Boolean   @default(false)
+  stoppedAt       DateTime?
   entries         Entry[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

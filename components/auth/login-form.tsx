@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type View = "login" | "signup" | "forgot" | "reset";
 
@@ -81,7 +84,7 @@ export function LoginForm() {
             className={`flex-1 cursor-pointer py-3 text-sm font-medium transition-colors ${
               view === "login"
                 ? "border-b-2 border-primary text-foreground"
-                : "text-muted hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Anmelden
@@ -92,7 +95,7 @@ export function LoginForm() {
             className={`flex-1 cursor-pointer py-3 text-sm font-medium transition-colors ${
               view === "signup"
                 ? "border-b-2 border-primary text-foreground"
-                : "text-muted hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Registrieren
@@ -103,7 +106,7 @@ export function LoginForm() {
       {view === "forgot" && (
         <div className="mb-6">
           <h2 className="text-lg font-medium text-foreground">Passwort zurücksetzen</h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-muted-foreground">
             Gib deine E-Mail-Adresse ein, um einen Link zum Zurücksetzen zu erhalten.
           </p>
         </div>
@@ -112,7 +115,7 @@ export function LoginForm() {
       {view === "reset" && (
         <div className="mb-6">
           <h2 className="text-lg font-medium text-foreground">Neues Passwort festlegen</h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-muted-foreground">
             Gib unten dein neues Passwort ein.
           </p>
         </div>
@@ -120,16 +123,13 @@ export function LoginForm() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {view === "signup" && (
-          <div>
-            <label htmlFor="name" className="mb-1 block text-sm font-medium text-foreground">
-              Name
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary"
               placeholder="Dein Name"
               required
             />
@@ -137,16 +137,13 @@ export function LoginForm() {
         )}
 
         {view !== "reset" && (
-          <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-foreground">
-              Email
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary"
               placeholder="you@example.com"
               required
             />
@@ -154,16 +151,15 @@ export function LoginForm() {
         )}
 
         {(view === "login" || view === "signup" || view === "reset") && (
-          <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-foreground">
+          <div className="space-y-2">
+            <Label htmlFor="password">
               {view === "reset" ? "Neues Passwort" : "Passwort"}
-            </label>
-            <input
+            </Label>
+            <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary"
               placeholder="Mind. 8 Zeichen"
               minLength={8}
               required
@@ -174,11 +170,7 @@ export function LoginForm() {
         {error && <p className="text-sm text-error">{error}</p>}
         {success && <p className="text-sm text-success">{success}</p>}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="mt-2 cursor-pointer rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        <Button type="submit" disabled={loading} className="mt-2 w-full">
           {loading
             ? "Laden..."
             : view === "login"
@@ -188,26 +180,28 @@ export function LoginForm() {
             : view === "forgot"
             ? "Link senden"
             : "Passwort zurücksetzen"}
-        </button>
+        </Button>
 
         {view === "login" && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => { setView("forgot"); setError(""); setSuccess(""); }}
-            className="cursor-pointer text-sm text-muted hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground"
           >
             Passwort vergessen?
-          </button>
+          </Button>
         )}
 
         {(view === "forgot" || view === "reset") && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => { setView("login"); setError(""); setSuccess(""); }}
-            className="cursor-pointer text-sm text-muted hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground"
           >
             Zurück zur Anmeldung
-          </button>
+          </Button>
         )}
       </form>
     </div>
