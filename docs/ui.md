@@ -14,4 +14,7 @@ Examples:
 
 ## Components
 
-Only Hero UI components are allowed. Do not create custom components.
+Use shadcn/ui components from `@/components/ui/`. Available components:
+- Button, Card, Input, Label, Checkbox, Separator
+
+Do not create custom base components - extend shadcn/ui components instead.

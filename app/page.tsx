@@ -17,10 +17,10 @@ export default async function Home() {
       <main className="flex w-full max-w-sm flex-col items-center gap-8">
         <div className="text-center">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            ADHD Diary
+            ADHS-Tagebuch
           </h1>
           <p className="mt-2 text-sm text-muted">
-            Track medication effects and daily wellbeing
+            Medikamentenwirkung und tägliches Wohlbefinden erfassen
           </p>
         </div>
         <LoginForm />

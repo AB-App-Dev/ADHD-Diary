@@ -29,7 +29,7 @@ export function LoginForm() {
       if (view === "login") {
         const { error } = await authClient.signIn.email({ email, password });
         if (error) {
-          setError(error.message ?? "Login failed");
+          setError(error.message ?? "Anmeldung fehlgeschlagen");
           setLoading(false);
           return;
         }
@@ -37,7 +37,7 @@ export function LoginForm() {
       } else if (view === "signup") {
         const { error } = await authClient.signUp.email({ email, password, name });
         if (error) {
-          setError(error.message ?? "Sign up failed");
+          setError(error.message ?? "Registrierung fehlgeschlagen");
           setLoading(false);
           return;
         }
@@ -45,26 +45,26 @@ export function LoginForm() {
       } else if (view === "forgot") {
         const { error } = await authClient.requestPasswordReset({ email, redirectTo: "/" });
         if (error) {
-          setError(error.message ?? "Failed to send reset link");
+          setError(error.message ?? "Link konnte nicht gesendet werden");
           setLoading(false);
           return;
         }
-        setSuccess("Check your email for the reset link");
+        setSuccess("Prüfe deine E-Mails für den Link zum Zurücksetzen");
         setLoading(false);
       } else if (view === "reset" && token) {
         const { error } = await authClient.resetPassword({ newPassword: password, token });
         if (error) {
-          setError(error.message ?? "Failed to reset password");
+          setError(error.message ?? "Passwort konnte nicht zurückgesetzt werden");
           setLoading(false);
           return;
         }
-        setSuccess("Password reset! You can now login.");
+        setSuccess("Passwort zurückgesetzt! Du kannst dich jetzt anmelden.");
         setView("login");
         setPassword("");
         setLoading(false);
       }
     } catch {
-      setError("An unexpected error occurred");
+      setError("Ein unerwarteter Fehler ist aufgetreten");
       setLoading(false);
     }
   }
@@ -78,42 +78,42 @@ export function LoginForm() {
           <button
             type="button"
             onClick={() => { setView("login"); setError(""); setSuccess(""); }}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${
+            className={`flex-1 cursor-pointer py-3 text-sm font-medium transition-colors ${
               view === "login"
                 ? "border-b-2 border-primary text-foreground"
                 : "text-muted hover:text-foreground"
             }`}
           >
-            Login
+            Anmelden
           </button>
           <button
             type="button"
             onClick={() => { setView("signup"); setError(""); setSuccess(""); }}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${
+            className={`flex-1 cursor-pointer py-3 text-sm font-medium transition-colors ${
               view === "signup"
                 ? "border-b-2 border-primary text-foreground"
                 : "text-muted hover:text-foreground"
             }`}
           >
-            Sign Up
+            Registrieren
           </button>
         </div>
       )}
 
       {view === "forgot" && (
         <div className="mb-6">
-          <h2 className="text-lg font-medium text-foreground">Reset Password</h2>
+          <h2 className="text-lg font-medium text-foreground">Passwort zurücksetzen</h2>
           <p className="mt-1 text-sm text-muted">
-            Enter your email to receive a reset link.
+            Gib deine E-Mail-Adresse ein, um einen Link zum Zurücksetzen zu erhalten.
           </p>
         </div>
       )}
 
       {view === "reset" && (
         <div className="mb-6">
-          <h2 className="text-lg font-medium text-foreground">Set New Password</h2>
+          <h2 className="text-lg font-medium text-foreground">Neues Passwort festlegen</h2>
           <p className="mt-1 text-sm text-muted">
-            Enter your new password below.
+            Gib unten dein neues Passwort ein.
           </p>
         </div>
       )}
@@ -130,7 +130,7 @@ export function LoginForm() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary"
-              placeholder="Your name"
+              placeholder="Dein Name"
               required
             />
           </div>
@@ -156,7 +156,7 @@ export function LoginForm() {
         {(view === "login" || view === "signup" || view === "reset") && (
           <div>
             <label htmlFor="password" className="mb-1 block text-sm font-medium text-foreground">
-              {view === "reset" ? "New Password" : "Password"}
+              {view === "reset" ? "Neues Passwort" : "Passwort"}
             </label>
             <input
               id="password"
@@ -164,7 +164,7 @@ export function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary"
-              placeholder="Min. 8 characters"
+              placeholder="Mind. 8 Zeichen"
               minLength={8}
               required
             />
@@ -177,26 +177,26 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-2 cursor-pointer rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading
-            ? "Loading..."
+            ? "Laden..."
             : view === "login"
-            ? "Login"
+            ? "Anmelden"
             : view === "signup"
-            ? "Sign Up"
+            ? "Registrieren"
             : view === "forgot"
-            ? "Send Reset Link"
-            : "Reset Password"}
+            ? "Link senden"
+            : "Passwort zurücksetzen"}
         </button>
 
         {view === "login" && (
           <button
             type="button"
             onClick={() => { setView("forgot"); setError(""); setSuccess(""); }}
-            className="text-sm text-muted hover:text-foreground"
+            className="cursor-pointer text-sm text-muted hover:text-foreground"
           >
-            Forgot password?
+            Passwort vergessen?
           </button>
         )}
 
@@ -204,9 +204,9 @@ export function LoginForm() {
           <button
             type="button"
             onClick={() => { setView("login"); setError(""); setSuccess(""); }}
-            className="text-sm text-muted hover:text-foreground"
+            className="cursor-pointer text-sm text-muted hover:text-foreground"
           >
-            Back to login
+            Zurück zur Anmeldung
           </button>
         )}
       </form>

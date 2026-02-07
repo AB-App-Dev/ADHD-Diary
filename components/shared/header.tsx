@@ -31,7 +31,7 @@ export function Header() {
     : session?.user?.email?.[0]?.toUpperCase() ?? "?";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-surface">
+    <header className="top-0 z-50 border-b border-border bg-surface">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         <Link href="/home" className="text-lg font-semibold text-foreground">
           ADHD Diary
@@ -40,7 +40,7 @@ export function Header() {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-medium text-white transition-opacity hover:opacity-90"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-default-300 text-sm font-medium text-foreground bg-stone-600 hover:bg-default-400"
           >
             {initials}
           </button>
