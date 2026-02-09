@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sessionFormSchema, type SessionFormData } from "@/lib/validations/session";
@@ -184,7 +185,7 @@ export async function saveWeekendEntry(data: WeekendFormData) {
 
   const { date, ...answers } = validation.data;
 
-  const entry = await prisma.entry.create({
+  await prisma.entry.create({
     data: {
       sessionId: session.id,
       date: startOfDay(date),
@@ -193,7 +194,7 @@ export async function saveWeekendEntry(data: WeekendFormData) {
     },
   });
 
-  return { success: true, entry };
+  redirect("/confirmation");
 }
 
 export async function getWorkdayEntry(sessionId: string, date: Date) {
@@ -238,7 +239,7 @@ export async function saveWorkdayEntry(data: WorkdayFormData) {
 
   const { date, ...answers } = validation.data;
 
-  const entry = await prisma.entry.create({
+  await prisma.entry.create({
     data: {
       sessionId: session.id,
       date: startOfDay(date),
@@ -247,5 +248,5 @@ export async function saveWorkdayEntry(data: WorkdayFormData) {
     },
   });
 
-  return { success: true, entry };
+  redirect("/confirmation");
 }

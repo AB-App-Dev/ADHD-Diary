@@ -2,6 +2,7 @@ import { z } from "zod";
 import { isWeekend, isWithinInterval, startOfDay } from "date-fns";
 
 const sliderValue = z.number().min(1, "Bitte wähle einen Wert aus").max(5);
+const optionalSliderValue = z.number().min(0).max(5);
 
 export const createWorkdayFormSchema = (sessionStart: Date, sessionEnd: Date) =>
   z.object({
@@ -19,15 +20,16 @@ export const createWorkdayFormSchema = (sessionStart: Date, sessionEnd: Date) =>
           }),
         { message: "Datum muss innerhalb des Überwachungszeitraums liegen" }
       ),
-    // Aufmerksamkeit und Schule
-    attention: sliderValue,
-    participation: sliderValue,
-    homework: sliderValue,
-    organisation: sliderValue,
+    // Aufmerksamkeit und Schule (optional - 0 allowed)
+    attention: optionalSliderValue,
+    participation: optionalSliderValue,
+    homework: optionalSliderValue,
+    organisation: optionalSliderValue,
     // Energie und Müdigkeit
     tiredness: sliderValue,
     sleep: sliderValue,
     concentration: sliderValue,
+    headache: sliderValue,
     // Stimmung
     mood: sliderValue,
     irritability: sliderValue,

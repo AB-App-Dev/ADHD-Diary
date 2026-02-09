@@ -156,7 +156,7 @@ export function SessionForm({ activeSession }: SessionFormProps) {
   };
 
   return (
-    <div className="flex min-h-screen items-start justify-center p-6">
+    <div className="flex min-h-screen items-start justify-center px-2 py-6 sm:px-6">
       <Card className="w-full max-w-lg">
         <CardHeader className="flex flex-col items-start gap-2">
           <h1 className="text-xl font-semibold">Medikamenten-Monitoring</h1>
@@ -199,7 +199,7 @@ export function SessionForm({ activeSession }: SessionFormProps) {
               </div>
             )}
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex flex-col gap-1.5 flex-1">
                 <Field className="gap-1.5">
                   <FieldLabel htmlFor="from-date-picker">Von</FieldLabel>
@@ -209,7 +209,7 @@ export function SessionForm({ activeSession }: SessionFormProps) {
                         variant="outline"
                         data-empty={!fromDate}
                         disabled={isActive}
-                        className={`data-[empty=true]:text-muted-foreground w-[212px] justify-between text-left font-normal ${errors.fromDate ? "border-red-500" : ""}`}
+                        className={`data-[empty=true]:text-muted-foreground w-full sm:w-[212px] justify-between text-left font-normal ${errors.fromDate ? "border-red-500" : ""}`}
                       >
                         {fromDate ? format(fromDate, "PPP", { locale: de }) : <span>Wähle ein Datum aus</span>}
                         <ChevronDownIcon />
@@ -239,7 +239,7 @@ export function SessionForm({ activeSession }: SessionFormProps) {
                         variant="outline"
                         data-empty={!toDate}
                         disabled={isActive}
-                        className={`data-[empty=true]:text-muted-foreground w-[212px] justify-between text-left font-normal ${errors.toDate ? "border-red-500" : ""}`}
+                        className={`data-[empty=true]:text-muted-foreground w-full sm:w-[212px] justify-between text-left font-normal ${errors.toDate ? "border-red-500" : ""}`}
                       >
                         {toDate ? format(toDate, "PPP", { locale: de }) : <span>Wähle ein Datum aus</span>}
                         <ChevronDownIcon />

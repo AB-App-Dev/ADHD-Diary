@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import { de } from "date-fns/locale";
 import { isSaturday, isSunday, format } from "date-fns";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
@@ -24,7 +23,6 @@ interface WeekendFormProps {
 }
 
 export function WeekendForm({ sessionStart, sessionEnd, existingData }: WeekendFormProps) {
-  const router = useRouter();
   const isReadOnly = !!existingData;
 
   const [errors, setErrors] = React.useState<Partial<Record<keyof WeekendFormData, string>>>({});
@@ -71,20 +69,18 @@ export function WeekendForm({ sessionStart, sessionEnd, existingData }: WeekendF
     const response = await saveWeekendEntry(result.data);
     setIsSubmitting(false);
 
-    if (response.error) {
+    // If we get here, there was an error (success redirects on server)
+    if (response?.error) {
       if (typeof response.error === "string") {
         setErrors({ date: response.error });
       }
-      return;
     }
-
-    router.push("/confirmation");
   };
 
   const isWeekend = (date: Date) => isSaturday(date) || isSunday(date);
 
   return (
-    <div className="flex min-h-screen items-start justify-center p-6">
+    <div className="flex min-h-screen items-start justify-center px-2 py-6 sm:px-6">
       <Card className="w-full max-w-lg">
         <CardHeader className="flex flex-col items-start gap-2">
           <h1 className="text-xl font-semibold">Wochenende</h1>

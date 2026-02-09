@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import { de } from "date-fns/locale";
 import { isWeekend, format } from "date-fns";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
@@ -15,6 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { createWorkdayFormSchema, type WorkdayFormData } from "@/lib/validations/workday";
 import { saveWorkdayEntry } from "@/actions/session-actions";
+import { toast } from "sonner";
 
 interface WorkdayFormProps {
   sessionStart: Date;
@@ -23,7 +23,6 @@ interface WorkdayFormProps {
 }
 
 export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayFormProps) {
-  const router = useRouter();
   const isReadOnly = !!existingData;
 
   const [errors, setErrors] = React.useState<Partial<Record<keyof WorkdayFormData, string>>>({});
@@ -36,6 +35,7 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
       tiredness: 0,
       sleep: 0,
       concentration: 0,
+      headache: 0,
       mood: 0,
       irritability: 0,
       motivation: 0,
@@ -81,18 +81,16 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
     const response = await saveWorkdayEntry(result.data);
     setIsSubmitting(false);
 
-    if (response.error) {
+    // If we get here, there was an error (success redirects on server)
+    if (response?.error) {
       if (typeof response.error === "string") {
-        setErrors({ date: response.error });
+        toast.error(response.error);
       }
-      return;
     }
-
-    router.push("/confirmation");
   };
 
   return (
-    <div className="flex min-h-screen items-start justify-center p-6">
+    <div className="flex min-h-screen items-start justify-center px-2 py-6 sm:px-6">
       <Card className="w-full max-w-lg">
         <CardHeader className="flex flex-col items-start gap-2">
           <h1 className="text-xl font-semibold">Schultag</h1>
@@ -247,7 +245,7 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
                 <Field className="mb-3">
                   <div className="flex justify-between items-center">
                   <FieldLabel>
-                    Müdigkeit nach der Schule
+                    Müdigkeit am Nachmittag
                   </FieldLabel>
                   <Badge variant="secondary">{formData.tiredness}</Badge>
                   </div>
@@ -282,7 +280,7 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
                     <p className="text-sm text-destructive mt-1">{errors.sleep}</p>
                   )}
                 </Field>
-                <Field>
+                <Field className="mb-3">
                   <div className="flex justify-between items-center">
                   <FieldLabel>
                     Mentale Konzentration am Nachmittag
@@ -299,6 +297,25 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
                   />
                   {errors.concentration && (
                     <p className="text-sm text-destructive mt-1">{errors.concentration}</p>
+                  )}
+                </Field>
+                <Field>
+                  <div className="flex justify-between items-center">
+                  <FieldLabel>
+                    Kopfschmerzen
+                  </FieldLabel>
+                  <Badge variant="secondary">{formData.headache}</Badge>
+                  </div>
+                  <Slider
+                    defaultValue={[0]}
+                    max={5}
+                    step={1}
+                    value={[formData.headache ?? 0]}
+                    onValueChange={([v]) => updateField("headache", v)}
+                    disabled={isReadOnly}
+                  />
+                  {errors.headache && (
+                    <p className="text-sm text-destructive mt-1">{errors.headache}</p>
                   )}
                 </Field>
               </div>
