@@ -2,7 +2,7 @@
 
 import React from "react";
 import { de } from "date-fns/locale";
-import { isWeekend, format, startOfToday } from "date-fns";
+import { isWeekend, format, startOfToday, startOfDay } from "date-fns";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -175,8 +175,8 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
                   ISOWeek
                   disabled={(date) =>
                     isWeekend(date) ||
-                    date < sessionStart ||
-                    date > sessionEnd
+                    date < startOfDay(sessionStart) ||
+                    date > startOfDay(sessionEnd)
                   }
                 />
               </PopoverContent>
