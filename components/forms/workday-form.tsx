@@ -2,7 +2,7 @@
 
 import React from "react";
 import { de } from "date-fns/locale";
-import { isWeekend, format } from "date-fns";
+import { isWeekend, format, startOfToday } from "date-fns";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -15,6 +15,16 @@ import { Badge } from "@/components/ui/badge";
 import { createWorkdayFormSchema, type WorkdayFormData } from "@/lib/validations/workday";
 import { saveWorkdayEntry } from "@/actions/session-actions";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface WorkdayFormProps {
   sessionStart: Date;
@@ -57,6 +67,21 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
   };
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [showFutureConfirm, setShowFutureConfirm] = React.useState(false);
+  const [validatedData, setValidatedData] = React.useState<WorkdayFormData | null>(null);
+
+  const submitEntry = async (data: WorkdayFormData) => {
+    setIsSubmitting(true);
+    const response = await saveWorkdayEntry(data);
+    setIsSubmitting(false);
+
+    // If we get here, there was an error (success redirects on server)
+    if (response?.error) {
+      if (typeof response.error === "string") {
+        toast.error(response.error);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -77,15 +102,21 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
       return;
     }
 
-    setIsSubmitting(true);
-    const response = await saveWorkdayEntry(result.data);
-    setIsSubmitting(false);
+    // Check if date is in the future
+    if (result.data.date > startOfToday()) {
+      setValidatedData(result.data);
+      setShowFutureConfirm(true);
+      return;
+    }
 
-    // If we get here, there was an error (success redirects on server)
-    if (response?.error) {
-      if (typeof response.error === "string") {
-        toast.error(response.error);
-      }
+    await submitEntry(result.data);
+  };
+
+  const handleConfirmFutureSubmit = async () => {
+    setShowFutureConfirm(false);
+    if (validatedData) {
+      await submitEntry(validatedData);
+      setValidatedData(null);
     }
   };
 
@@ -505,6 +536,23 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
           )}
         </form>
       </Card>
+
+      <AlertDialog open={showFutureConfirm} onOpenChange={setShowFutureConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Datum in der Zukunft</AlertDialogTitle>
+            <AlertDialogDescription>
+              Das ausgewählte Datum liegt in der Zukunft. Bist du sicher, dass du die Daten für dieses Datum speichern möchtest?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmFutureSubmit}>
+              Bestätigen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
