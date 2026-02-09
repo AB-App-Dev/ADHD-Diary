@@ -9,6 +9,12 @@ import { createWeekendFormSchema, type WeekendFormData } from "@/lib/validations
 import { createWorkdayFormSchema, type WorkdayFormData } from "@/lib/validations/workday";
 import { startOfDay, endOfDay, previousSaturday, isSaturday, isSunday, isWeekend } from "date-fns";
 
+// Create UTC midnight date preserving the local date components
+// Fixes timezone issue where Vercel (UTC) would shift dates back a day
+function toUTCDate(date: Date): Date {
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+}
+
 async function getAuthUser() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -97,8 +103,8 @@ export async function createAndStartSession(data: SessionFormData) {
       medicationName: data.medicationName,
       dosage: data.dosage,
       intakeTimes: [data.intakeTime],
-      monitoringFrom: data.monitoringFrom,
-      monitoringTo: data.monitoringTo,
+      monitoringFrom: toUTCDate(data.monitoringFrom),
+      monitoringTo: toUTCDate(data.monitoringTo),
       isLocked: true,
     },
   });
@@ -188,7 +194,7 @@ export async function saveWeekendEntry(data: WeekendFormData) {
   await prisma.entry.create({
     data: {
       sessionId: session.id,
-      date: startOfDay(date),
+      date: toUTCDate(date),
       type: "WEEKEND",
       answers,
     },
@@ -198,7 +204,7 @@ export async function saveWeekendEntry(data: WeekendFormData) {
 }
 
 export async function getWorkdayEntry(sessionId: string, date: Date) {
-  const dayStart = startOfDay(date);
+  const dayStart = toUTCDate(date);
 
   const entry = await prisma.entry.findFirst({
     where: {
@@ -242,7 +248,7 @@ export async function saveWorkdayEntry(data: WorkdayFormData) {
   await prisma.entry.create({
     data: {
       sessionId: session.id,
-      date: startOfDay(date),
+      date: toUTCDate(date),
       type: "WORKDAY",
       answers,
     },
