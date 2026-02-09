@@ -3,8 +3,9 @@ import { isSaturday, isSunday, isWithinInterval, startOfDay } from "date-fns";
 
 export const createWeekendFormSchema = (sessionStart: Date, sessionEnd: Date) =>
   z.object({
-    date: z.coerce
-      .date({ message: "Datum ist erforderlich" })
+    date: z.string({ message: "Datum ist erforderlich" })
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Ungültiges Datumsformat")
+      .transform((str) => new Date(str + "T00:00:00.000Z"))
       .refine(
         (date) => isSaturday(date) || isSunday(date),
         { message: "Datum muss ein Samstag oder Sonntag sein" }
@@ -38,4 +39,7 @@ export const createWeekendFormSchema = (sessionStart: Date, sessionEnd: Date) =>
     }),
   });
 
-export type WeekendFormData = z.infer<ReturnType<typeof createWeekendFormSchema>>;
+// Input type (what the form sends - date as string)
+export type WeekendFormInput = z.input<ReturnType<typeof createWeekendFormSchema>>;
+// Output type (after Zod validation - date as Date)
+export type WeekendFormData = z.output<ReturnType<typeof createWeekendFormSchema>>;

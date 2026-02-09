@@ -12,7 +12,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { ChevronDownIcon, BrainIcon, ThumbsUpIcon, SmileIcon, CloudMoonIcon } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { createWorkdayFormSchema, type WorkdayFormData } from "@/lib/validations/workday";
+import { createWorkdayFormSchema, type WorkdayFormData, type WorkdayFormInput } from "@/lib/validations/workday";
 import { saveWorkdayEntry } from "@/actions/session-actions";
 import { toast } from "sonner";
 import {
@@ -32,11 +32,14 @@ interface WorkdayFormProps {
   existingData?: WorkdayFormData;
 }
 
+// Form state uses Date for Calendar, separate from submission type
+type FormState = Omit<WorkdayFormData, 'date'> & { date?: Date };
+
 export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayFormProps) {
   const isReadOnly = !!existingData;
 
   const [errors, setErrors] = React.useState<Partial<Record<keyof WorkdayFormData, string>>>({});
-  const [formData, setFormData] = React.useState<Partial<WorkdayFormData>>(
+  const [formData, setFormData] = React.useState<Partial<FormState>>(
     existingData ?? {
       attention: 0,
       participation: 0,
@@ -57,9 +60,9 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
     }
   );
 
-  const updateField = <K extends keyof WorkdayFormData>(
+  const updateField = <K extends keyof FormState>(
     field: K,
-    value: WorkdayFormData[K]
+    value: FormState[K]
   ) => {
     if (isReadOnly) return;
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -68,9 +71,9 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [showFutureConfirm, setShowFutureConfirm] = React.useState(false);
-  const [validatedData, setValidatedData] = React.useState<WorkdayFormData | null>(null);
+  const [pendingSubmission, setPendingSubmission] = React.useState<WorkdayFormInput | null>(null);
 
-  const submitEntry = async (data: WorkdayFormData) => {
+  const submitEntry = async (data: WorkdayFormInput) => {
     setIsSubmitting(true);
     const response = await saveWorkdayEntry(data);
     setIsSubmitting(false);
@@ -87,8 +90,14 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
     e.preventDefault();
     if (isReadOnly || isSubmitting) return;
 
+    // Convert Date to string for validation and submission
+    const submissionData = {
+      ...formData,
+      date: formData.date ? format(formData.date, "yyyy-MM-dd") : undefined,
+    };
+
     const schema = createWorkdayFormSchema(sessionStart, sessionEnd);
-    const result = schema.safeParse(formData);
+    const result = schema.safeParse(submissionData);
 
     if (!result.success) {
       const fieldErrors: Partial<Record<keyof WorkdayFormData, string>> = {};
@@ -102,21 +111,21 @@ export function WorkdayForm({ sessionStart, sessionEnd, existingData }: WorkdayF
       return;
     }
 
-    // Check if date is in the future
+    // Check if date is in the future (use transformed Date from result)
     if (result.data.date > startOfToday()) {
-      setValidatedData(result.data);
+      setPendingSubmission(submissionData as WorkdayFormInput);
       setShowFutureConfirm(true);
       return;
     }
 
-    await submitEntry(result.data);
+    await submitEntry(submissionData as WorkdayFormInput);
   };
 
   const handleConfirmFutureSubmit = async () => {
     setShowFutureConfirm(false);
-    if (validatedData) {
-      await submitEntry(validatedData);
-      setValidatedData(null);
+    if (pendingSubmission) {
+      await submitEntry(pendingSubmission);
+      setPendingSubmission(null);
     }
   };
 

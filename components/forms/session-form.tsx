@@ -112,12 +112,13 @@ export function SessionForm({ activeSession }: SessionFormProps) {
 
     setIsSubmitting(true);
     try {
+      // Send dates as strings to avoid timezone conversion issues
       const result = await createAndStartSession({
         medicationName: medikament,
         dosage: dosierung,
         intakeTime: einnahmezeit,
-        monitoringFrom: fromDate!,
-        monitoringTo: toDate!,
+        monitoringFrom: format(fromDate!, "yyyy-MM-dd"),
+        monitoringTo: format(toDate!, "yyyy-MM-dd"),
       });
 
       if (result.error) {

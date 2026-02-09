@@ -6,8 +6,9 @@ const optionalSliderValue = z.number().min(0).max(5);
 
 export const createWorkdayFormSchema = (sessionStart: Date, sessionEnd: Date) =>
   z.object({
-    date: z.coerce
-      .date({ message: "Datum ist erforderlich" })
+    date: z.string({ message: "Datum ist erforderlich" })
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Ungültiges Datumsformat")
+      .transform((str) => new Date(str + "T00:00:00.000Z"))
       .refine(
         (date) => !isWeekend(date),
         { message: "Datum muss ein Wochentag sein" }
@@ -44,4 +45,7 @@ export const createWorkdayFormSchema = (sessionStart: Date, sessionEnd: Date) =>
     comment: z.string().optional(),
   });
 
-export type WorkdayFormData = z.infer<ReturnType<typeof createWorkdayFormSchema>>;
+// Input type (what the form sends - date as string)
+export type WorkdayFormInput = z.input<ReturnType<typeof createWorkdayFormSchema>>;
+// Output type (after Zod validation - date as Date)
+export type WorkdayFormData = z.output<ReturnType<typeof createWorkdayFormSchema>>;

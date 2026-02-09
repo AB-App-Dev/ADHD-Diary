@@ -13,7 +13,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { ChevronDownIcon, CircleUserIcon, UserCheckIcon, CircleCheckBigIcon } from "lucide-react";
-import { createWeekendFormSchema, type WeekendFormData } from "@/lib/validations/weekend";
+import { createWeekendFormSchema, type WeekendFormData, type WeekendFormInput } from "@/lib/validations/weekend";
 import { saveWeekendEntry } from "@/actions/session-actions";
 
 interface WeekendFormProps {
@@ -22,11 +22,14 @@ interface WeekendFormProps {
   existingData?: WeekendFormData;
 }
 
+// Form state uses Date for Calendar, separate from submission type
+type FormState = Omit<WeekendFormData, 'date'> & { date?: Date };
+
 export function WeekendForm({ sessionStart, sessionEnd, existingData }: WeekendFormProps) {
   const isReadOnly = !!existingData;
 
   const [errors, setErrors] = React.useState<Partial<Record<keyof WeekendFormData, string>>>({});
-  const [formData, setFormData] = React.useState<Partial<WeekendFormData>>(
+  const [formData, setFormData] = React.useState<Partial<FormState>>(
     existingData ?? {
       whatWasBetter: "",
       whatWasDifficult: "",
@@ -35,9 +38,9 @@ export function WeekendForm({ sessionStart, sessionEnd, existingData }: WeekendF
     }
   );
 
-  const updateField = <K extends keyof WeekendFormData>(
+  const updateField = <K extends keyof FormState>(
     field: K,
-    value: WeekendFormData[K]
+    value: FormState[K]
   ) => {
     if (isReadOnly) return;
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -50,8 +53,14 @@ export function WeekendForm({ sessionStart, sessionEnd, existingData }: WeekendF
     e.preventDefault();
     if (isReadOnly || isSubmitting) return;
 
+    // Convert Date to string for validation and submission
+    const submissionData = {
+      ...formData,
+      date: formData.date ? format(formData.date, "yyyy-MM-dd") : undefined,
+    };
+
     const schema = createWeekendFormSchema(sessionStart, sessionEnd);
-    const result = schema.safeParse(formData);
+    const result = schema.safeParse(submissionData);
 
     if (!result.success) {
       const fieldErrors: Partial<Record<keyof WeekendFormData, string>> = {};
@@ -66,7 +75,7 @@ export function WeekendForm({ sessionStart, sessionEnd, existingData }: WeekendF
     }
 
     setIsSubmitting(true);
-    const response = await saveWeekendEntry(result.data);
+    const response = await saveWeekendEntry(submissionData as WeekendFormInput);
     setIsSubmitting(false);
 
     // If we get here, there was an error (success redirects on server)

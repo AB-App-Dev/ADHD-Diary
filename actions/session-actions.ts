@@ -4,16 +4,10 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { sessionFormSchema, type SessionFormData } from "@/lib/validations/session";
-import { createWeekendFormSchema, type WeekendFormData } from "@/lib/validations/weekend";
-import { createWorkdayFormSchema, type WorkdayFormData } from "@/lib/validations/workday";
+import { sessionFormSchema, type SessionFormInput } from "@/lib/validations/session";
+import { createWeekendFormSchema, type WeekendFormInput } from "@/lib/validations/weekend";
+import { createWorkdayFormSchema, type WorkdayFormInput } from "@/lib/validations/workday";
 import { startOfDay, endOfDay, previousSaturday, isSaturday, isSunday, isWeekend } from "date-fns";
-
-// Create UTC midnight date preserving the local date components
-// Fixes timezone issue where Vercel (UTC) would shift dates back a day
-function toUTCDate(date: Date): Date {
-  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-}
 
 async function getAuthUser() {
   const session = await auth.api.getSession({
@@ -84,7 +78,7 @@ export async function getAllSessions() {
   }));
 }
 
-export async function createAndStartSession(data: SessionFormData) {
+export async function createAndStartSession(data: SessionFormInput) {
   const user = await getAuthUser();
 
   const validation = sessionFormSchema.safeParse(data);
@@ -100,11 +94,11 @@ export async function createAndStartSession(data: SessionFormData) {
   const session = await prisma.monitoringSession.create({
     data: {
       userId: user.id,
-      medicationName: data.medicationName,
-      dosage: data.dosage,
-      intakeTimes: [data.intakeTime],
-      monitoringFrom: toUTCDate(data.monitoringFrom),
-      monitoringTo: toUTCDate(data.monitoringTo),
+      medicationName: validation.data.medicationName,
+      dosage: validation.data.dosage,
+      intakeTimes: [validation.data.intakeTime],
+      monitoringFrom: validation.data.monitoringFrom,
+      monitoringTo: validation.data.monitoringTo,
       isLocked: true,
     },
   });
@@ -168,7 +162,7 @@ export async function getWeekendEntry(sessionId: string) {
   return entry;
 }
 
-export async function saveWeekendEntry(data: WeekendFormData) {
+export async function saveWeekendEntry(data: WeekendFormInput) {
   const session = await getActiveSession();
 
   if (!session) {
@@ -194,7 +188,7 @@ export async function saveWeekendEntry(data: WeekendFormData) {
   await prisma.entry.create({
     data: {
       sessionId: session.id,
-      date: toUTCDate(date),
+      date, // Already UTC midnight from Zod transform
       type: "WEEKEND",
       answers,
     },
@@ -204,20 +198,18 @@ export async function saveWeekendEntry(data: WeekendFormData) {
 }
 
 export async function getWorkdayEntry(sessionId: string, date: Date) {
-  const dayStart = toUTCDate(date);
-
   const entry = await prisma.entry.findFirst({
     where: {
       sessionId,
       type: "WORKDAY",
-      date: dayStart,
+      date, // Date is already UTC midnight
     },
   });
 
   return entry;
 }
 
-export async function saveWorkdayEntry(data: WorkdayFormData) {
+export async function saveWorkdayEntry(data: WorkdayFormInput) {
   const session = await getActiveSession();
 
   if (!session) {
@@ -248,7 +240,7 @@ export async function saveWorkdayEntry(data: WorkdayFormData) {
   await prisma.entry.create({
     data: {
       sessionId: session.id,
-      date: toUTCDate(date),
+      date, // Already UTC midnight from Zod transform
       type: "WORKDAY",
       answers,
     },
