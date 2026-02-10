@@ -4,12 +4,21 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
+import { UserAvatar } from "@/components/avatar/user-avatar";
+import { AvatarUpload } from "@/components/avatar/avatar-upload";
 
 export function Header() {
   const { data: session } = useSession();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [avatarKey, setAvatarKey] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  function handleAvatarUploadSuccess() {
+    setAvatarKey((k) => k + 1);
+    setDropdownOpen(false);
+    router.refresh();
+  }
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -26,9 +35,9 @@ export function Header() {
     router.push("/");
   }
 
-  const initials = session?.user?.name
-    ? session.user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-    : session?.user?.email?.[0]?.toUpperCase() ?? "?";
+  const avatarImage = session?.user?.image
+    ? `${session.user.image}?v=${avatarKey}`
+    : null;
 
   return (
     <header className="top-0 z-50 border-b border-border bg-surface">
@@ -40,9 +49,13 @@ export function Header() {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-default-300 text-sm font-medium text-foreground bg-stone-600 hover:bg-default-400"
+            className="flex h-9 w-9 items-center justify-center rounded-full hover:ring-2 hover:ring-white/20"
           >
-            {initials}
+            <UserAvatar
+              name={session?.user?.name}
+              email={session?.user?.email}
+              image={avatarImage}
+            />
           </button>
 
           {dropdownOpen && (
@@ -52,6 +65,7 @@ export function Header() {
                   {session?.user?.name ?? "User"}
                 </p>
               </div>
+              <AvatarUpload onSuccess={handleAvatarUploadSuccess} />
               <Link
                 href="/sessions"
                 onClick={() => setDropdownOpen(false)}
