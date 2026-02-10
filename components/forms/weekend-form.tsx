@@ -78,7 +78,7 @@ export function WeekendForm({ sessionStart, sessionEnd, existingData }: WeekendF
       return;
     }
 
-    router.push("/home");
+    router.push("/confirmation");
   };
 
   const isWeekend = (date: Date) => isSaturday(date) || isSunday(date);
@@ -148,7 +148,7 @@ export function WeekendForm({ sessionStart, sessionEnd, existingData }: WeekendF
             <div className="flex gap-4">
               <div className="flex flex-col gap-1.5 flex-1">
                 <p className="flex items-center mb-3">
-                  <CircleUserIcon className="mr-2" /><b>Beobachtungen der Eltern</b>
+                  <CircleUserIcon className="mr-2 text-teal-500" /><b>Beobachtungen der Eltern</b>
                 </p>
                 <Field className="mb-3">
                   <FieldLabel>Was diese Woche besser war</FieldLabel>
@@ -194,7 +194,7 @@ export function WeekendForm({ sessionStart, sessionEnd, existingData }: WeekendF
             <div className="flex gap-4">
               <div className="flex flex-col gap-1.5 flex-1">
                 <p className="flex items-center mb-3">
-                  <UserCheckIcon className="mr-2" /> <b>Selbsteinschätzung des Teenagers</b>
+                  <UserCheckIcon className="mr-2 text-violet-500" /> <b>Selbsteinschätzung des Teenagers</b>
                 </p>
                 <p className="text-sm">Diese Woche - </p>
                 <Field className="mb-3">
@@ -305,7 +305,7 @@ export function WeekendForm({ sessionStart, sessionEnd, existingData }: WeekendF
             <div className="flex gap-4 mb-20">
               <div className="flex flex-col gap-1.5 flex-1">
                 <p className="flex items-center mb-3">
-                  <CircleCheckBigIcon className="mr-2" /> <b>Gesamtbewertung der Woche</b>
+                  <CircleCheckBigIcon className="mr-2 text-emerald-500" /> <b>Gesamtbewertung der Woche</b>
                 </p>
                 <Field>
                   <RadioGroup

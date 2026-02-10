@@ -9,11 +9,21 @@ import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { ChevronDownIcon } from "lucide-react";
 import { createAndStartSession, stopSession } from "@/actions/session-actions";
 import type { MonitoringSession } from "@prisma/client";
@@ -146,12 +156,39 @@ export function SessionForm({ activeSession }: SessionFormProps) {
             mit und beziehen Sie, wenn möglich, die Rückmeldungen der Schule mit
             ein.
           </p>
+
+          {isActive && (
+            <Button
+                  type="button"
+                  className="w-full cursor-pointer mt-6"
+                  onClick={() => router.push("/form")}
+                >
+                  Zum Formular
+                </Button>
+            )}
         </CardHeader>
 
         <Separator />
 
         <form onSubmit={handleSubmit}>
           <CardContent className="flex flex-col gap-4">
+            {isActive ? (
+              <div className="rounded-lg bg-blue-50 dark:bg-blue-950 px-4 py-3 mb-6">
+                <p className="text-sm text-blue-700 dark:text-blue-200">
+                  <strong>Aktive Sitzung:</strong> Die Einstellungen sind gesperrt.
+                  Stoppen Sie die Sitzung, um eine neue zu starten.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-950 px-4 py-3 mb-6">
+                <p className="text-sm text-amber-700 dark:text-amber-200">
+                  <strong>Achtung:</strong> Nach dem Start können die
+                  Einstellungen nicht mehr geändert werden. Die Analyse muss
+                  gestoppt und neu gestartet werden.
+                </p>
+              </div>
+            )}
+
             <div className="flex gap-4">
               <div className="flex flex-col gap-1.5 flex-1">
                 <Field className="gap-1.5">
@@ -259,49 +296,42 @@ export function SessionForm({ activeSession }: SessionFormProps) {
               </FieldGroup>
             </div>
 
-            {!isActive && (
-              <>
-                <div className="flex items-center gap-2 mt-2">
-                  <Checkbox id="skip-intro" />
-                  <Label htmlFor="skip-intro" className="cursor-pointer font-normal">
-                    Diese Seite nicht mehr anzeigen, direkt zum Formular weiterleiten
-                  </Label>
-                </div>
-                <p className="text-xs text-muted-foreground -mt-2">
-                  Diese Einstellung kann über das Benutzermenü unter Einstellungen
-                  zurückgesetzt werden.
-                </p>
-              </>
-            )}
-
-            {isActive ? (
-              <div className="rounded-lg bg-blue-50 dark:bg-blue-950 px-4 py-3">
-                <p className="text-sm text-blue-700 dark:text-blue-200">
-                  <strong>Aktive Sitzung:</strong> Die Einstellungen sind gesperrt.
-                  Stoppen Sie die Sitzung, um eine neue zu starten.
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-lg bg-amber-50 dark:bg-amber-950 px-4 py-3">
-                <p className="text-sm text-amber-700 dark:text-amber-200">
-                  <strong>Achtung:</strong> Nach dem Start können die
-                  Einstellungen nicht mehr geändert werden. Die Analyse muss
-                  gestoppt und neu gestartet werden.
-                </p>
-              </div>
-            )}
           </CardContent>
-          <CardFooter className="pt-3 pb-3">
+          <CardFooter className="flex flex-col gap-2 pt-12 pb-3">
             {isActive ? (
-              <Button
-                type="button"
-                variant="destructive"
-                className="w-full cursor-pointer"
-                onClick={handleStop}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Wird gestoppt..." : "Sitzung stoppen"}
-              </Button>
+              <>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      className="w-full cursor-pointer"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Wird gestoppt..." : "Sitzung stoppen"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Sitzung stoppen?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Sind Sie sicher, dass Sie die Sitzung beenden möchten? Alle
+                        bisherigen Einträge bleiben erhalten, aber Sie können keine
+                        neuen Einträge mehr hinzufügen.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleStop}
+                        variant="destructive"
+                      >
+                        Ja, Sitzung stoppen
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
             ) : (
               <Button
                 type="submit"

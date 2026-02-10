@@ -5,7 +5,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sessionFormSchema, type SessionFormData } from "@/lib/validations/session";
 import { createWeekendFormSchema, type WeekendFormData } from "@/lib/validations/weekend";
-import { startOfDay, endOfDay, previousSaturday, isSaturday, isSunday } from "date-fns";
+import { createWorkdayFormSchema, type WorkdayFormData } from "@/lib/validations/workday";
+import { startOfDay, endOfDay, previousSaturday, isSaturday, isSunday, isWeekend } from "date-fns";
 
 async function getAuthUser() {
   const session = await auth.api.getSession({
@@ -32,6 +33,48 @@ export async function getActiveSession() {
   });
 
   return session;
+}
+
+export async function getSessionById(id: string) {
+  const user = await getAuthUser();
+  const today = startOfDay(new Date());
+
+  const session = await prisma.monitoringSession.findFirst({
+    where: { id, userId: user.id },
+    include: {
+      entries: { orderBy: { date: "desc" } },
+    },
+  });
+
+  if (!session) return null;
+
+  return {
+    ...session,
+    isActive:
+      session.isLocked &&
+      !session.stoppedAt &&
+      session.monitoringTo >= today,
+  };
+}
+
+export async function getAllSessions() {
+  const user = await getAuthUser();
+  const today = startOfDay(new Date());
+
+  const sessions = await prisma.monitoringSession.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    include: { _count: { select: { entries: true } } },
+  });
+
+  return sessions.map((session) => ({
+    ...session,
+    isActive:
+      session.isLocked &&
+      !session.stoppedAt &&
+      session.monitoringTo >= today,
+    entryCount: session._count.entries,
+  }));
 }
 
 export async function createAndStartSession(data: SessionFormData) {
@@ -146,6 +189,60 @@ export async function saveWeekendEntry(data: WeekendFormData) {
       sessionId: session.id,
       date: startOfDay(date),
       type: "WEEKEND",
+      answers,
+    },
+  });
+
+  return { success: true, entry };
+}
+
+export async function getWorkdayEntry(sessionId: string, date: Date) {
+  const dayStart = startOfDay(date);
+
+  const entry = await prisma.entry.findFirst({
+    where: {
+      sessionId,
+      type: "WORKDAY",
+      date: dayStart,
+    },
+  });
+
+  return entry;
+}
+
+export async function saveWorkdayEntry(data: WorkdayFormData) {
+  const session = await getActiveSession();
+
+  if (!session) {
+    return { error: "Keine aktive Sitzung gefunden" };
+  }
+
+  const sessionEnd = session.stoppedAt ?? session.monitoringTo;
+  const schema = createWorkdayFormSchema(session.monitoringFrom, sessionEnd);
+  const validation = schema.safeParse(data);
+
+  if (!validation.success) {
+    return { error: validation.error.flatten().fieldErrors };
+  }
+
+  // Check if date is a weekend
+  if (isWeekend(validation.data.date)) {
+    return { error: "Datum muss ein Wochentag sein" };
+  }
+
+  // Check if entry already exists for this date
+  const existingEntry = await getWorkdayEntry(session.id, validation.data.date);
+  if (existingEntry) {
+    return { error: "Für diesen Tag wurde bereits ein Eintrag erstellt" };
+  }
+
+  const { date, ...answers } = validation.data;
+
+  const entry = await prisma.entry.create({
+    data: {
+      sessionId: session.id,
+      date: startOfDay(date),
+      type: "WORKDAY",
       answers,
     },
   });
