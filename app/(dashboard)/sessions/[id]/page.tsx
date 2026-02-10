@@ -96,7 +96,7 @@ export default async function SessionDetailPage({
         </Card>
       ) : (
         <div className="space-y-2">
-          {session.entries.map((entry) => (
+          {session.entries.map((entry: (typeof session.entries)[number]) => (
             <Card key={entry.id}>
               <CardContent className="flex items-center justify-between py-4">
                 <div className="flex items-center gap-3">

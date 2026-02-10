@@ -17,15 +17,9 @@ export const createWeekendFormSchema = (sessionStart: Date, sessionEnd: Date) =>
           }),
         { message: "Datum muss innerhalb des Überwachungszeitraums liegen" }
       ),
-    whatWasBetter: z
-      .string({ required_error: "Dieses Feld ist erforderlich" })
-      .min(1, "Dieses Feld ist erforderlich"),
-    whatWasDifficult: z
-      .string({ required_error: "Dieses Feld ist erforderlich" })
-      .min(1, "Dieses Feld ist erforderlich"),
-    sideEffects: z
-      .string({ required_error: "Dieses Feld ist erforderlich" })
-      .min(1, "Dieses Feld ist erforderlich"),
+    whatWasBetter: z.string().min(1, "Dieses Feld ist erforderlich"),
+    whatWasDifficult: z.string().min(1, "Dieses Feld ist erforderlich"),
+    sideEffects: z.string().min(1, "Dieses Feld ist erforderlich"),
     concentration: z.enum(["yes", "no"], {
       message: "Bitte wähle eine Option",
     }),
