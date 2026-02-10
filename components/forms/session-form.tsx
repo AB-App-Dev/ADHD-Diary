@@ -26,7 +26,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ChevronDownIcon } from "lucide-react";
 import { createAndStartSession, stopSession } from "@/actions/session-actions";
-import type { MonitoringSession } from "@prisma/client";
+
+type MonitoringSession = {
+  id: string;
+  medicationName: string;
+  dosage: string;
+  intakeTimes: string[];
+  monitoringFrom: Date;
+  monitoringTo: Date;
+  isLocked: boolean;
+  stoppedAt: Date | null;
+};
 
 type ValidationErrors = {
   fromDate?: string;
