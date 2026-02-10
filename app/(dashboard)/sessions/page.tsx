@@ -7,6 +7,8 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 
+type SessionItem = Awaited<ReturnType<typeof getAllSessions>>[number];
+
 export default async function SessionsPage() {
   const sessions = await getAllSessions();
 
@@ -28,7 +30,7 @@ export default async function SessionsPage() {
           </Card>
         ) : (
           <div className="space-y-3">
-            {sessions.map((session) => (
+            {sessions.map((session: SessionItem) => (
               <Link key={session.id} href={`/sessions/${session.id}`}>
                 <Card className="transition-colors hover:bg-muted/50">
                   <CardContent className="flex items-center justify-between px-4 py-2">
