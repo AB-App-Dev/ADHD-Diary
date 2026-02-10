@@ -10,6 +10,14 @@ export default async function WeekendFormPage() {
     redirect("/home");
   }
 
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+  if (!isWeekend) {
+    redirect("/form/workday");
+  }
+
   const sessionEnd = session.stoppedAt ?? session.monitoringTo;
   const existingEntry = await getWeekendEntry(session.id);
 

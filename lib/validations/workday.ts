@@ -8,7 +8,10 @@ export const createWorkdayFormSchema = (sessionStart: Date, sessionEnd: Date) =>
   z.object({
     date: z.string({ message: "Datum ist erforderlich" })
       .regex(/^\d{4}-\d{2}-\d{2}$/, "Ungültiges Datumsformat")
-      .transform((str) => new Date(str + "T00:00:00.000Z"))
+      .transform((str) => {
+        const [year, month, day] = str.split('-').map(Number);
+        return new Date(year, month - 1, day); // Local midnight
+      })
       .refine(
         (date) => !isWeekend(date),
         { message: "Datum muss ein Wochentag sein" }
