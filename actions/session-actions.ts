@@ -67,7 +67,7 @@ export async function getAllSessions() {
     include: { _count: { select: { entries: true } } },
   });
 
-  return sessions.map((session) => ({
+  return sessions.map((session: (typeof sessions)[number]) => ({
     ...session,
     isActive:
       session.isLocked &&
