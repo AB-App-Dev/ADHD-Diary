@@ -68,6 +68,7 @@ export function WorkdayChart({ entries, dateRange }: WorkdayChartProps) {
     const option: EChartsOption = {
       title: {
         text: `Tagesanalyse: ${dateRange.from.toLocaleDateString("de-DE")} - ${dateRange.to.toLocaleDateString("de-DE")}`,
+        textStyle: { color: "#fff" },
       },
       tooltip: {
         trigger: "axis",
@@ -77,6 +78,7 @@ export function WorkdayChart({ entries, dateRange }: WorkdayChartProps) {
         data: FIELD_KEYS.map((k) => FIELD_LABELS[k]),
         type: "scroll",
         bottom: 10,
+        textStyle: { color: "#fff" },
       },
       grid: {
         left: "3%",
@@ -88,12 +90,14 @@ export function WorkdayChart({ entries, dateRange }: WorkdayChartProps) {
         type: "category",
         boundaryGap: false,
         data: dates,
+        axisLabel: { color: "#fff" },
       },
       yAxis: {
         type: "value",
         min: 0,
         max: 5,
         interval: 1,
+        axisLabel: { color: "#fff" },
       },
       series,
     };

@@ -56,6 +56,7 @@ export function WorkdayRadarChart({ entries }: WorkdayRadarChartProps) {
     const option: EChartsOption = {
       title: {
         text: `Tagesprofil: ${new Date(selectedEntry.date).toLocaleDateString("de-DE")}`,
+        textStyle: { color: "#fff" },
       },
       tooltip: {
         trigger: "item",
@@ -65,6 +66,7 @@ export function WorkdayRadarChart({ entries }: WorkdayRadarChartProps) {
           name: FIELD_LABELS[key],
           max: 5,
         })),
+        axisName: { color: "#fff" },
       },
       series: [
         {

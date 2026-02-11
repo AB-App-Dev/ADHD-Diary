@@ -90,12 +90,13 @@ export function WorkdayHeatmapChart({ entries }: WorkdayHeatmapChartProps) {
         type: "category",
         data: dates,
         splitArea: { show: true },
-        axisLabel: { rotate: 45 },
+        axisLabel: { rotate: 45, color: "#fff" },
       },
       yAxis: {
         type: "category",
         data: yLabels,
         splitArea: { show: true },
+        axisLabel: { color: "#fff" },
       },
       visualMap: {
         min: 0,
@@ -107,6 +108,7 @@ export function WorkdayHeatmapChart({ entries }: WorkdayHeatmapChartProps) {
         inRange: {
           color: ["#f3f4f6", "#fde68a", "#fbbf24", "#f97316", "#dc2626"],
         },
+        textStyle: { color: "#fff" },
       },
       series: [
         {

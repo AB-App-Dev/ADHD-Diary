@@ -74,6 +74,7 @@ export function WorkdayScatterChart({ entries }: WorkdayScatterChartProps) {
     const option: EChartsOption = {
       title: {
         text: `${FIELD_LABELS[yAxis]} vs ${FIELD_LABELS[xAxis]}`,
+        textStyle: { color: "#fff" },
       },
       tooltip: {
         trigger: "item",
@@ -95,6 +96,8 @@ export function WorkdayScatterChart({ entries }: WorkdayScatterChartProps) {
         max: 5,
         nameLocation: "middle",
         nameGap: 30,
+        axisLabel: { color: "#fff" },
+        nameTextStyle: { color: "#fff" },
       },
       yAxis: {
         type: "value",
@@ -103,6 +106,8 @@ export function WorkdayScatterChart({ entries }: WorkdayScatterChartProps) {
         max: 5,
         nameLocation: "middle",
         nameGap: 40,
+        axisLabel: { color: "#fff" },
+        nameTextStyle: { color: "#fff" },
       },
       series: [
         {
