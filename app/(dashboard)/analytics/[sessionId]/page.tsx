@@ -6,21 +6,21 @@ import { WorkdayHeatmapChart } from "@/components/charts/workday-heatmap-chart";
 import { WorkdayScatterChart } from "@/components/charts/workday-scatter-chart";
 
 const FIELD_LABELS: Record<string, string> = {
-  attention: "Aufmerksamkeit",
-  participation: "Hausaufgaben-Beginn",
-  homework: "Aufgaben-Erledigung",
-  organisation: "Organisation",
-  tiredness: "Müdigkeit",
-  sleep: "Mittagsschlaf-Bedürfnis",
-  concentration: "Konzentration",
+  attention: "Aufmerksamkeit im Unterricht",
+  participation: "Beginn der Hausaufgaben",
+  homework: "Erledigung der Aufgaben",
+  organisation: "Organisation der Schulaufgaben",
+  tiredness: "Müdigkeit am Nachmittag",
+  sleep: "Bedürfnis nach Mittagsschlaf",
+  concentration: "Mentale Konzentration am Nachmittag",
   headache: "Kopfschmerzen",
   mood: "Stimmung",
   irritability: "Reizbarkeit",
-  motivation: "Motivation",
-  hobby: "Hobby-Interesse",
+  motivation: "Motivation für Pflichten",
+  hobby: "Interesse an Hobbys/Freunden",
   sleepQuality: "Schlafqualität",
   asleep: "Einschlafgeschwindigkeit",
-  morning: "Morgen-Befinden",
+  morning: "Morgendliches Befinden",
   appetite: "Appetit",
 };
 
@@ -113,9 +113,9 @@ export default async function SessionAnalyticsPage({
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="border-b">
-                    <th className="p-2 text-left font-semibold">Datum</th>
+                    <th className="p-2 text-left text-xs font-semibold">Datum</th>
                     {parameterNames.map((param) => (
-                      <th key={param} className="p-2 text-center font-semibold">
+                      <th key={param} className="p-2 text-center text-xs font-semibold">
                         {FIELD_LABELS[param] || param}
                       </th>
                     ))}

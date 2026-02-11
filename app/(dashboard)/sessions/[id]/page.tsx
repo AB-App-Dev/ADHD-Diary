@@ -21,37 +21,67 @@ import {
   BarChart3Icon,
 } from "lucide-react";
 
-const workdayLabels: Record<string, string> = {
-  attention: "Aufmerksamkeit",
-  participation: "Mitarbeit",
-  homework: "Hausaufgaben",
-  organisation: "Organisation",
-  tiredness: "Müdigkeit",
-  sleep: "Schlaf",
-  concentration: "Konzentration",
-  headache: "Kopfschmerzen",
-  mood: "Stimmung",
-  irritability: "Reizbarkeit",
-  motivation: "Motivation",
-  hobby: "Hobbys",
-  sleepQuality: "Schlafqualität",
-  asleep: "Einschlafen",
-  morning: "Morgens aufstehen",
-  appetite: "Appetit",
-  comment: "Kommentar",
-};
+const workdaySections = [
+  {
+    title: "Aufmerksamkeit und Schule",
+    fields: [
+      { key: "attention", label: "Aufmerksamkeit im Unterricht" },
+      { key: "participation", label: "Beginn der Hausaufgaben" },
+      { key: "homework", label: "Erledigung der Aufgaben" },
+      { key: "organisation", label: "Organisation der Schulaufgaben" },
+    ],
+  },
+  {
+    title: "Energie und Müdigkeit",
+    fields: [
+      { key: "tiredness", label: "Müdigkeit am Nachmittag" },
+      { key: "sleep", label: "Bedürfnis nach Mittagsschlaf" },
+      { key: "concentration", label: "Mentale Konzentration am Nachmittag" },
+      { key: "headache", label: "Kopfschmerzen" },
+    ],
+  },
+  {
+    title: "Stimmung",
+    fields: [
+      { key: "mood", label: "Stimmung" },
+      { key: "irritability", label: "Reizbarkeit" },
+      { key: "motivation", label: "Motivation für Pflichten" },
+      { key: "hobby", label: "Interesse an Hobbys/Freunden" },
+    ],
+  },
+  {
+    title: "Schlaf und Appetit",
+    fields: [
+      { key: "sleepQuality", label: "Schlafqualität" },
+      { key: "asleep", label: "Einschlafgeschwindigkeit" },
+      { key: "morning", label: "Morgendliches Befinden" },
+      { key: "appetite", label: "Appetit" },
+      { key: "comment", label: "Kommentar" },
+    ],
+  },
+];
 
-const weekendLabels: Record<string, string> = {
-  whatWasBetter: "Was war besser?",
-  whatWasDifficult: "Was war schwierig?",
-  sideEffects: "Nebenwirkungen",
-  concentration: "Konzentration verbessert?",
-  startingTasks: "Aufgaben starten einfacher?",
-  lessTired: "Weniger müde?",
-  medicationHelps: "Medikament hilft?",
-  weeklyRating: "Wochenbewertung",
-  comment: "Kommentar",
-};
+const weekendSections = [
+  {
+    title: "Beobachtungen der Eltern",
+    fields: [
+      { key: "whatWasBetter", label: "Was diese Woche besser war" },
+      { key: "whatWasDifficult", label: "Was diese Woche schwieriger war" },
+      { key: "sideEffects", label: "Nebenwirkungen" },
+    ],
+  },
+  {
+    title: "Selbsteinschätzung des Teenagers",
+    fields: [
+      { key: "concentration", label: "Ich konnte mich besser konzentrieren" },
+      { key: "startingTasks", label: "Ich konnte leichter mit Aufgaben anfangen" },
+      { key: "lessTired", label: "Ich fühlte mich weniger müde" },
+      { key: "medicationHelps", label: "Das Medikament hilft mir" },
+      { key: "weeklyRating", label: "Wochenbewertung" },
+      { key: "comment", label: "Kommentar" },
+    ],
+  },
+];
 
 function formatValue(key: string, value: unknown): string {
   if (value === null || value === undefined || value === "") return "–";
@@ -162,14 +192,14 @@ export default async function SessionDetailPage({
         <Accordion type="single" collapsible className="space-y-2">
           {session.entries.map((entry: (typeof session.entries)[number]) => {
             const answers = entry.answers as Record<string, unknown>;
-            const labels = entry.type === "WORKDAY" ? workdayLabels : weekendLabels;
+            const sections = entry.type === "WORKDAY" ? workdaySections : weekendSections;
             return (
               <AccordionItem
                 key={entry.id}
                 value={entry.id}
                 className="border rounded-lg px-4 bg-card"
               >
-                <AccordionTrigger className="py-3 hover:no-underline">
+                <AccordionTrigger className="py-3 hover:no-underline cursor-pointer">
                   <div className="flex items-center justify-between w-full pr-4">
                     <div className="flex items-center gap-3">
                       <FileTextIcon className="h-4 w-4 text-muted-foreground" />
@@ -181,11 +211,18 @@ export default async function SessionDetailPage({
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-                    {Object.entries(labels).map(([key, label]) => (
-                      <div key={key} className="flex justify-between">
-                        <span className="text-muted-foreground">{label}</span>
-                        <span>{formatValue(key, answers[key])}</span>
+                  <div className="space-y-4">
+                    {sections.map((section) => (
+                      <div key={section.title}>
+                        <h4 className="font-medium text-sm mb-2">{section.title}</h4>
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                          {section.fields.map(({ key, label }) => (
+                            <div key={key} className="flex justify-between">
+                              <span className="text-muted-foreground">{label}</span>
+                              <span>{formatValue(key, answers[key])}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
