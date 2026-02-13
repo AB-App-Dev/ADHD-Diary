@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ADHD Therapy Monitoring App
+
+A mobile/web app to track a teenager's medication effects and daily/weekly wellbeing. The app collects daily "workday" entries and a single weekly entry (weekend), provides analytics over selectable time periods, and includes configurable medication/settings and reminder behaviour.
+
+## Tech Stack
+
+- **Framework**: Next.js (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: PostgreSQL via Neon
+- **ORM**: Prisma
+
+## Features
+
+- **Daily Workday Form**: Track attention, energy, mood, sleep & appetite using Likert scales
+- **Weekly Weekend Form**: Parent observations, side effects, overall assessment
+- **Settings Management**: Medication name, dosage, intake times, monitoring period
+- **Analytics Dashboard**: Visualizations by category, trend analysis, compliance rate
+- **Notifications**: Push, email, SMS reminders (configurable)
+
+## User Flow
+
+1. Register/Login as parent
+2. Configure medication and monitoring period in Settings
+3. Start monitoring (locks settings)
+4. Fill daily workday forms on school/work days
+5. Fill weekly form on weekends
+6. View analytics and trends
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Add your Neon database connection string
+
+# Run database migrations
+npx prisma migrate dev
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev      # Start development server
+npm run build    # Production build
+npm run lint     # Run ESLint
+```
 
-## Learn More
+## Documentation
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `docs/SPECS.md` for full specification.
